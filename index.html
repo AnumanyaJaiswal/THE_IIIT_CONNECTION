@@ -15,14 +15,27 @@
         <h1 class="title">The IIIT Connection</h1>
 
         <div class="buttons">
-
-            <button class="Createbt">Create / Edit</button>
-
-            <button class="Createbt">Find</button>
+            <a href="front.html" onclick="setEditMode()">
+                <button class="Createbt">Create / Edit Profile</button>
+            </a>
+            <a href="recruiter.html">
+                <button class="Createbt">Find</button></a>
 
         </div>
 
     </div>
+    <script>
+        function setEditMode() {
+            const email = prompt("Enter your email to edit profile (or leave blank to create new):");
+
+            if (email) {
+                localStorage.setItem("editEmail", email.toLowerCase());
+            } else {
+                localStorage.removeItem("editEmail");
+            }
+        }
+    </script>
 
 </body>
+
 </html>
