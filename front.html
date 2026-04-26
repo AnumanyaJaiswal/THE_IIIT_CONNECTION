@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skill Profile | IIIT Connection</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="page-container">
+        <div class="glass-panel">
+            <h2 class="text-center mb-4">Developer Profile</h2>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="name" placeholder="e.g. Shaswat">
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="email" placeholder="student@iiit.ac.in">
+                </div>
+
+                <div class="form-group full">
+                    <label>Phone Number</label>
+                    <input type="text" id="phone" placeholder="+91 00000 00000">
+                </div>
+
+                <div class="form-group full">
+                    <label>About You</label>
+                    <textarea id="about" placeholder="e.g. B.Tech CSE student passionate about building scalable web apps with the MERN stack..."></textarea>
+                </div>
+            </div>
+
+            <div class="skills-section mt-4">
+                <label>Tech Stack & Skills</label>
+                <div class="skills-container" id="skill-box">
+                    </div>
+            </div>
+
+            <div id="status-msg" class="alert-msg"></div>
+
+            <button class="btn btn-primary btn-full mt-4" onclick="saveProfile()">Save Profile</button>
+            <a href="index.html" class="btn btn-secondary btn-full mt-4">Back to Home</a>
+
+            <div id="output" class="mt-4"></div>
+        </div>
+    </div>
+
+    <script>
+        const availableSkills = ["HTML", "CSS", "JavaScript", "React", "Node.js", "Express", "MongoDB", "SQL", "Python", "C++", "Java", "Git", "GitHub", "Docker", "AWS"];
+
+        // Generate skill tags dynamically
+        const skillBox = document.getElementById("skill-box");
+        availableSkills.forEach(skill => {
+            skillBox.innerHTML += `
+                <label class="skill-label">
+                    <input type="checkbox" value="${skill}" class="skill-checkbox">
+                    <span>${skill}</span>
+                </label>
+            `;
+        });
+
+        function showMessage(msg, type) {
+            const status = document.getElementById("status-msg");
+            status.textContent = msg;
+            status.className = `alert-msg alert-${type}`;
+            status.style.display = "block";
+            setTimeout(() => status.style.display = "none", 4000);
+        }
+
+        function saveProfile() {
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("email").value.trim().toLowerCase();
+            const phone = document.getElementById("phone").value.trim();
+            const about = document.getElementById("about").value;
+
+            const selectedSkills = document.querySelectorAll(".skill-checkbox:checked");
+            const skills = Array.from(selectedSkills).map(skill => skill.value);
+
+            if (!name || !email || !phone) {
+                showMessage("Please fill in your name, email, and phone number.", "error");
+                return;
+            }
+
+            let users = JSON.parse(localStorage.getItem("users")) || [];
+            const index = users.findIndex(user => user.email.toLowerCase() === email || user.phone === phone);
+
+            const updatedUser = { name, email, phone, about, skills };
+
+            if (index !== -1) {
+                users[index] = updatedUser;
+                showMessage("Profile updated successfully!", "success");
+            } else {
+                users.push(updatedUser);
+                showMessage("Profile created successfully!", "success");
+            }
+
+            localStorage.setItem("users", JSON.stringify(users));
+            displayProfile(updatedUser);
+        }
+
+        function displayProfile(user) {
+            const output = document.getElementById("output");
+            const skillsHTML = user.skills.map(skill => `<span class="badge">${skill}</span>`).join("");
+
+            output.innerHTML = `
+                <div class="user-card mt-4">
+                    <h3>${user.name}</h3>
+                    <div class="user-meta">${user.email} • ${user.phone}</div>
+                    <p class="user-about">${user.about || "No bio provided."}</p>
+                    <div>${skillsHTML}</div>
+                </div>
+            `;
+        }
+
+        window.onload = () => {
+            const editEmail = localStorage.getItem("editEmail");
+            if (!editEmail) return;
+
+            const users = JSON.parse(localStorage.getItem("users")) || [];
+            const user = users.find(u => u.email.toLowerCase() === editEmail);
+
+            if (user) {
+                document.getElementById("name").value = user.name;
+                document.getElementById("email").value = user.email;
+                document.getElementById("phone").value = user.phone;
+                document.getElementById("about").value = user.about;
+
+                user.skills.forEach(skill => {
+                    const checkbox = document.querySelector(`.skill-checkbox[value="${skill}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+        };
+    </script>
+</body>
+</html>

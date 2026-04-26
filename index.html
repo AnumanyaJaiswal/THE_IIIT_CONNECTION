@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The IIIT Connection</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="landing-wrapper">
+        <div class="glow-orb"></div>
+        <div class="landing-content">
+            <h1 class="title">The IIIT Connection</h1>
+            <p class="subtitle">Build your profile. Find your team.</p>
+
+            <div class="buttons">
+                <button onclick="setEditMode()" class="btn btn-primary">Create / Edit Profile</button>
+                <a href="recruiter.html" class="btn btn-secondary">Find Developers</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setEditMode() {
+            const email = prompt("Enter your email to edit your profile (leave blank to create a new one):");
+            
+            // If the user clicks "Cancel" on the prompt, do nothing
+            if (email === null) return; 
+
+            const trimmedEmail = email.trim().toLowerCase();
+            const users = JSON.parse(localStorage.getItem("users")) || [];
+
+            if (trimmedEmail === "") {
+                // Scenario 1: User left it empty
+                alert("No email provided. Starting a fresh profile registration!");
+                localStorage.removeItem("editEmail");
+                window.location.href = "front.html";
+                
+            } else {
+                // Check if the entered email already exists in the database
+                const userExists = users.some(u => u.email.toLowerCase() === trimmedEmail);
+
+                if (userExists) {
+                    // Scenario 2: User entered a registered email
+                    alert("Welcome back! Loading your existing profile.");
+                    localStorage.setItem("editEmail", trimmedEmail);
+                } else {
+                    // Scenario 3: User entered an unregistered email
+                    alert("Email not found in our system. Setting up a new profile registration for this email!");
+                    localStorage.setItem("editEmail", trimmedEmail); 
+                }
+                
+                // Redirect after the alert is dismissed
+                window.location.href = "front.html";
+            }
+        }
+    </script>
+
+</body>
+</html>

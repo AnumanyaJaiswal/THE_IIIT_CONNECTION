@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Find Talent | IIIT Connection</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div style="padding: 20px; text-align: right;">
+        <a href="index.html" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.9rem;">&larr; Back to Home</a>
+    </div>
+
+    <div class="page-container" style="margin-top: 0;">
+        <div class="dashboard-grid">
+            
+            <div class="sidebar glass-panel">
+                <h3 class="mb-4">Filter by Skills</h3>
+                <div class="skills-container" id="filter-box">
+                    </div>
+                <button class="btn btn-primary btn-full mt-4" onclick="search()">Apply Filters</button>
+            </div>
+
+            <div class="results" id="results">
+                </div>
+
+        </div>
+    </div>
+
+    <script>
+        const availableSkills = ["HTML", "CSS", "JavaScript", "React", "Node.js", "Express", "MongoDB", "SQL", "Python", "C++", "Java", "Git", "GitHub", "Docker", "AWS"];
+
+        // Generate filter tags dynamically
+        const filterBox = document.getElementById("filter-box");
+        availableSkills.forEach(skill => {
+            filterBox.innerHTML += `
+                <label class="skill-label">
+                    <input type="checkbox" value="${skill}" class="filter-checkbox">
+                    <span>${skill}</span>
+                </label>
+            `;
+        });
+
+        function search() {
+            const selected = document.querySelectorAll(".filter-checkbox:checked");
+            const selectedSkills = Array.from(selected).map(cb => cb.value);
+
+            const users = JSON.parse(localStorage.getItem("users")) || [];
+
+            const filtered = users.filter(user => {
+                if(selectedSkills.length === 0) return true;
+                return selectedSkills.every(skill => user.skills.includes(skill));
+            });
+
+            display(filtered);
+        }
+
+        function display(users) {
+            const res = document.getElementById("results");
+            res.innerHTML = "";
+
+            if(users.length === 0){
+                res.innerHTML = `<div class="glass-panel text-center" style="color: var(--muted);">No developers found with that tech stack.</div>`;
+                return;
+            }
+
+            users.forEach(u => {
+                const skills = u.skills.map(skill => `<span class="badge">${skill}</span>`).join("");
+                
+                res.innerHTML += `
+                    <div class="user-card">
+                        <h3>${u.name}</h3>
+                        <div class="user-meta">${u.email} • ${u.phone}</div>
+                        <p class="user-about">${u.about || "No bio provided."}</p>
+                        <div>${skills}</div>
+                    </div>
+                `;
+            });
+        }
+
+        // Load all users initially
+        window.onload = () => {
+            const users = JSON.parse(localStorage.getItem("users")) || [];
+            display(users);
+        };
+    </script>
+</body>
+</html>
